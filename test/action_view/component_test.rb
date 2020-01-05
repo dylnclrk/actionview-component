@@ -232,6 +232,18 @@ class ActionView::ComponentTest < ActionView::Component::TestCase
     assert_html_matches "<span>The Awesome post component!</span>", render_inline(post).to_html
   end
 
+  def test_no_initializer
+    if RUBY_VERSION < "2.7"
+      exception = assert_raises NotImplementedError do
+        render_inline(NoInitializerComponent)
+      end
+
+      assert_includes exception.message, "must implement #initialize"
+    else
+      assert_html_matches "Hello, world!", render_inline(NoInitializerComponent).text
+    end
+  end
+
   private
 
   def modify_file(file, content)

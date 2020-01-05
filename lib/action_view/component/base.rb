@@ -115,21 +115,21 @@ module ActionView
         end
 
         def source_location
-          # Require #initialize to be defined so that we can use
-          # method#source_location to look up the file name
-          # of the component.
-          #
-          # If we were able to only support Ruby 2.7+,
-          # We could just use Module#const_source_location,
-          # rendering this unnecessary.
-          raise NotImplementedError.new("#{self} must implement #initialize.") unless has_initializer?
+          if RUBY_VERSION < "2.7"
+            # When using a version of Ruby < 2.7, require #initialize
+            # to be defined so that we can use method#source_location
+            # to look up the file name of the component.'
+            raise NotImplementedError.new("#{self} must implement #initialize.") unless has_initializer?
 
-          instance_method(:initialize).source_location[0]
+            return instance_method(:initialize).source_location[0]
+          end
+
+          Module.const_source_location(self.name)[0]
         end
 
         def eager_load!
           self.descendants.each do |descendant|
-            descendant.compile if descendant.has_initializer?
+            descendant.compile if RUBY_VERSION >= "2.7" || descendant.has_initializer?
           end
         end
 
