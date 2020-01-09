@@ -32,6 +32,6 @@ def assert_html_matches(expected, actual)
   assert_equal(trim_result(expected), trim_result(actual))
 end
 
-def supports_const_source_location?
+def const_source_location_supported?
   Module.respond_to? :const_source_location
 end

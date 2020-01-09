@@ -142,7 +142,7 @@ module ActionView
 
         def source_location
           @source_location ||=
-              if respond_to? :const_source_location
+              if const_source_location_supported?
                 const_source_location(self.name)[0]
               else
                 # For Ruby < 2.7.0, use `method#source_location` on `#initialize`
@@ -206,6 +206,10 @@ module ActionView
 
         private
 
+        def const_source_location_supported?
+          respond_to? :const_source_location
+        end
+
         def matching_views_in_source_location
           return [] unless source_location
           (Dir["#{source_location.chomp(File.extname(source_location))}.*{#{ActionView::Template.template_handler_extensions.join(',')}}"] - [source_location])
@@ -229,7 +233,7 @@ module ActionView
             begin
               errors = []
 
-              unless Module.respond_to? :const_source_location
+              unless const_source_location_supported?
                 # To support Ruby < 2.7.0, require `#initialize` to be defined so that we can use
                 # `method#source_location`.
                 errors << "#{self} must implement #initialize." if source_location.nil?

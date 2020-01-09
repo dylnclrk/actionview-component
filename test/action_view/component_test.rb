@@ -373,7 +373,7 @@ class ActionView::ComponentTest < ActionView::Component::TestCase
   end
 
   def test_missing_initializer
-    skip unless supports_const_source_location?
+    skip unless const_source_location_supported?
 
     assert_html_matches "Hello, world!", render_inline(MissingInitializerComponent).text
   end
