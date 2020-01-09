@@ -186,6 +186,8 @@ class IntegrationTest < ActionDispatch::IntegrationTest
   end
 
   test "does not compile components without initializers" do
+    skip if RUBY_VERSION >= "2.7.0"
+
     assert !MissingInitializerComponent.compiled?
   end
 end

@@ -142,15 +142,11 @@ module ActionView
 
         def source_location
           @source_location ||=
-              begin
-                # Require #initialize to be defined so that we can use
-                # method#source_location to look up the file name
-                # of the component.
-                #
-                # If we were able to only support Ruby 2.7+,
-                # We could just use Module#const_source_location,
-                # rendering this unnecessary.
-                #
+              if respond_to? :const_source_location
+                const_source_location(self.name)[0]
+              else
+                # For Ruby < 2.7.0, use `method#source_location` on `#initialize`
+
                 initialize_method = instance_method(:initialize)
                 initialize_method.source_location[0] if initialize_method.owner == self
               end
@@ -232,7 +228,13 @@ module ActionView
           @template_errors ||=
             begin
               errors = []
-              errors << "#{self} must implement #initialize." if source_location.nil?
+
+              unless Module.respond_to? :const_source_location
+                # To support Ruby < 2.7.0, require `#initialize` to be defined so that we can use
+                # `method#source_location`.
+                errors << "#{self} must implement #initialize." if source_location.nil?
+              end
+
               errors << "Could not find a template file for #{self}." if templates.empty?
 
               if templates.count { |template| template[:variant].nil? } > 1

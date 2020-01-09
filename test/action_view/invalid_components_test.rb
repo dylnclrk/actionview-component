@@ -2,6 +2,8 @@
 
 class ActionView::InvalidComponentTest < ActionView::Component::TestCase
   def test_raises_error_when_initializer_is_not_defined
+    skip if RUBY_VERSION >= "2.7.0"
+
     exception = assert_raises ActionView::Component::TemplateError do
       render_inline(MissingInitializerComponent)
     end

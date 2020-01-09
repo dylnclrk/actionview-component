@@ -372,6 +372,12 @@ class ActionView::ComponentTest < ActionView::Component::TestCase
     assert_html_matches "<span>The Awesome post component!</span>", render_inline(post).to_html
   end
 
+  def test_missing_initializer
+    skip unless RUBY_VERSION > "2.7.0"
+
+    assert_html_matches "Hello, world!", render_inline(MissingInitializerComponent).text
+  end
+
   private
 
   def modify_file(file, content)
