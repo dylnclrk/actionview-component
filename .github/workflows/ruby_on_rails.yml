@@ -26,6 +26,7 @@ jobs:
         gem install nio4r -v '1.2.1'
         gem install nio4r -v '2.5.2'
         gem install html_tokenizer -v '0.0.7'
+        gem install jaro_winkler -v '1.5.4'
         echo "*** successful!"
         gem install bundler:1.14.0
         bundle update
