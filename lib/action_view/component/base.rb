@@ -207,7 +207,7 @@ module ActionView
         private
 
         def const_source_location_supported?
-          respond_to? :const_source_location
+          respond_to? :const_source_location # introduced in Ruby 2.7
         end
 
         def matching_views_in_source_location
