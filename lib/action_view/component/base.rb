@@ -234,8 +234,8 @@ module ActionView
               errors = []
 
               unless const_source_location_supported?
-                # To support Ruby < 2.7.0, require `#initialize` to be defined so that we can use
-                # `method#source_location`.
+                # Require `#initialize` to be defined so that we can use `method#source_location`
+                # to look up the filename of the component.
                 errors << "#{self} must implement #initialize." if source_location.nil?
               end
 
