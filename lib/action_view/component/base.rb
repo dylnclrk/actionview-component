@@ -132,21 +132,6 @@ module ActionView
           super
         end
 
-        def safe_new(options)
-          # Check the arity of `#initialize` to avoid passing an empty
-          # `options` hash when no arguments are expected. Also, check
-          # `options` to avoid dropping arguments passed to `#render`,
-          # which might hide a helpful `ArgumentError`.
-
-          arity = self.instance_method(:initialize).arity
-
-          if (options.blank? && arity.zero?)
-            self.new
-          else
-            self.new(options)
-          end
-        end
-
         def call_method_name(variant)
           if variant.present? && variants.include?(variant)
             "call_#{variant}"
@@ -198,6 +183,29 @@ module ActionView
               end
             RUBY
           end
+
+          # To allow component initializers that take no options,
+          # check the arity of `#initialize` to avoid passing an
+          # empty `options` hash when no arguments are expected.
+          if instance_method(:initialize).arity.zero?
+            safe_new_method = <<-RUBY
+              def safe_new(options)
+                unless options.blank? # Check `options` to avoid dropping arguments passed to `#render`
+                  raise "Component `#{name}` was rendered with options, but initializer does not accept arguments."
+                end
+  
+                new
+              end
+            RUBY
+          else
+            safe_new_method = <<-RUBY
+              def safe_new(options)
+                new(options)
+              end
+            RUBY
+          end
+
+          class_eval safe_new_method, __FILE__, __LINE__ + 1
 
           @compiled = true
         end
